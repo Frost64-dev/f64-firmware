@@ -82,12 +82,13 @@ The table is expected to contain the following fields:
 
 | Offset | Size | Name        | Description                                          |
 |--------|------|-------------|------------------------------------------------------|
-| 0x00   | 8    | Width       | The native width of the screen in pixels             |
-| 0x08   | 8    | Height      | The native height of the screen in pixels            |
-| 0x10   | 8    | Depth       | The native depth of the screen in bits per pixel     |
-| 0x18   | 8    | ModeCount   | The number of supported modes                        |
+| 0x00   | 4    | Width       | The native width of the screen in pixels             |
+| 0x04   | 4    | Height      | The native height of the screen in pixels            |
+| 0x08   | 1    | Depth       | The native depth of the screen in bits per pixel     |
+| 0x09   | 3    | Align0      | Padding                                              |
+| 0x0C   | 4    | ModeCount   | The number of supported modes                        |
 | 0x20   | 8    | ModeGetFunc | The address of the function to get info about a mode |
-| 0x80   | 8    | ModeGetFunc | The address of the function to set a mode            |
+| 0x80   | 8    | ModeSetFunc | The address of the function to set a mode            |
 | 0x88   | 8    | GetFBFunc   | The address of the function to get the framebuffer   |
 
 The table for each mode is expected to be as follows:
@@ -128,6 +129,44 @@ The memory info table is expected to contain the following fields:
 | 0x10   | 8    | MemNum     | The number of memory regions                                  |
 | 0x18   | 8    | MemGetFunc | The address of the function to get info about a memory region |
 
+The returned table for each memory region is expected to be as follows:
+
+| Offset | Size | Name        | Description                           |
+|--------|------|-------------|---------------------------------------|
+| 0x00   | 8    | Base        | The base address of the memory region |
+| 0x08   | 8    | Size        | The size of the memory region         |
+| 0x10   | 8    | Type        | The type of the memory region         |
+
+The type is expected to be one of the following:
+
+- 0x00 - Available
+- 0x01 - Firmware
+- 0x02 - Reserved
+- 0x03 - Framebuffer
+- 0x04 - Bootloader
+
 ### The functions
 
 The functions are expected to be called as described in the calling conventions section.
+
+#### DevGetFunc
+
+The function has 2 arguments:
+
+- `r0` - The device index
+- `r1` - A pointer to a buffer to store the device info table
+
+The functions returns the following:
+
+- `r0` - Device ID, -1 if the device doesn't exist
+
+If the pointer is 0 the function won't copy the table to the buffer, but will still return the device ID.
+
+### Memory map
+
+As there is no way to detect how much RAM is available, the firmware will just say all of unused address space is available.
+
+### Notes
+
+- The protocol is not fully implemented, or even fully designed yet. It is subject to change at any time without any notice.
+- The current firmware only supports the device subtable, with only the console device implemented.

@@ -33,4 +33,4 @@ bootloader:
 
 
 run: all bootloader
-	$(EMU) -pbin/firmware.bin -Dimage/disk.iso
+	@$(EMU) -pbin/firmware.bin -Dimage/disk.iso

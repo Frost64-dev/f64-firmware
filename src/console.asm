@@ -6,10 +6,12 @@
  * Output: r0 is 0 for success, 1 for failure
  */
 Console_Init:
+    push r15
     mov r0, 0
     call IOBus_FindDevice
     cmp r0, -1
     jz .error
+    mov r15, r0 ; r15 = device index
 
     mov r0, 0
     mov r1, CONSOLE_DEVICE_LOCATION
@@ -17,8 +19,10 @@ Console_Init:
     cmp r0, 0
     jnz .error
 
-    mov r0, 0
-    ret
+    mov r0, 0 ; device ID
+    mov r1, r15 ; device index
+    pop r15 ; restore r15
+    jmp RegisterDevice ; can handle the rest
 
 .error:
     mov r0, 1

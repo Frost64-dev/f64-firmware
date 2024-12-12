@@ -9,11 +9,14 @@
  * Output: r0 is 0 for success, 1 for failure
  */
 Storage_Init:
+    push r15
+
     ; find the storage device
-    mov r0, 0
+    mov r0, 2
     call IOBus_FindDevice
     cmp r0, -1
     jz .error
+    mov r15, r0 ; r15 = device index
 
     ; map the storage device
     mov r0, 2
@@ -29,8 +32,11 @@ Storage_Init:
     cmp r0, 0
     jnz .error
 
-    mov r0, 0
-    ret
+    ; register the storage device
+    mov r0, 2 ; device ID
+    mov r1, r15 ; device index
+    pop r15 ; restore r15
+    jmp RegisterDevice ; can handle the rest
 
 .error:
     mov r0, 1

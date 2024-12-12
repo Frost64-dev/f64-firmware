@@ -9,6 +9,7 @@
  * Sends a command to the IOBus. Data should already be in the appropriate registers.
  * Input: r0 = Command
  * Output: r0 = Status, 0 for success, 1 for failure
+ * Overwrites: r0 (rare case where this is reported)
  */
 IOBus_SendCommand:
     mov QWORD [IOBUS_COMMAND], r0
@@ -28,19 +29,19 @@ IOBus_SendCommand:
  * Output: r0 = Index of device, -1 if not found
  */
 IOBus_FindDevice:
-    push r15
+    mov r3, r0 ; save device ID
 
     ; first run the Get bus info command to get the number of devices
     mov r0, 0
     call IOBus_SendCommand
     cmp r0, 0
     jnz .error
-    mov r15, QWORD [IOBUS_DATA0] ; r15 = number of devices
+    mov r4, QWORD [IOBUS_DATA0] ; r4 = number of devices
 
     ; now run the Get device info command for each device
     xor r2, r2 ; r2 = index
 .l:
-    cmp r2, r15
+    cmp r2, r4
     jz .error
     mov QWORD [IOBUS_DATA0], r2
     mov r0, 1
@@ -48,18 +49,16 @@ IOBus_FindDevice:
     cmp r0, 0
     jnz .error
     mov r1, QWORD [IOBUS_DATA0] ; r1 = device ID
-    cmp r1, r0
+    cmp r1, r3
     jz .found
     inc r2
     jmp .l
 
 .found:
-    pop r15
     mov r0, r2
     ret
 
 .error:
-    pop r15
     mov r0, -1
     ret
 
