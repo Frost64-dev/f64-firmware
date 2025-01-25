@@ -75,7 +75,7 @@ GetDeviceTable:
     ret
 
 .video:
-    mov r0, 0 ; unsupported
+    mov r0, VideoDeviceTable
     ret
 
 .storage:

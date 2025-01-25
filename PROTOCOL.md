@@ -101,10 +101,10 @@ The table for each mode is expected to be as follows:
 | 0x09   | 1    | Align0      | Padding                                   |
 | 0x0A   | 2    | RefreshRate | The refresh rate of the screen in Hz      |
 | 0x0C   | 4    | Align1      | Padding                                   |
-| 0x10   | 1    | RedSize     | The red size of each pixel                |
-| 0x11   | 1    | GreenSize   | The green size of each pixel              |
-| 0x12   | 1    | BlueSize    | The blue size of each pixel               |
-| 0x13   | 1    | AlphaSize   | The alpha size of each pixel              |
+| 0x10   | 1    | RedSize     | The red size in bits of each pixel        |
+| 0x11   | 1    | GreenSize   | The green size in bits of each pixel      |
+| 0x12   | 1    | BlueSize    | The blue size in bits of each pixel       |
+| 0x13   | 1    | AlphaSize   | The alpha size in bits of each pixel      |
 | 0x14   | 1    | RedShift    | The red shift in each pixel               |
 | 0x15   | 1    | GreenShift  | The green shift in each pixel             |
 | 0x16   | 1    | BlueShift   | The blue shift in each pixel              |

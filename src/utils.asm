@@ -23,6 +23,31 @@ memset:
     pop sbp
     ret
 
+/* memset32
+ * This function fills a memory region with a given 32-bit value.
+ * Inputs: r0 = pointer to memory region, r1 = value to fill, r2 = number of 32-bit values to fill
+ * Outputs: r0 = pointer to memory region
+ */
+memset32:
+    push sbp
+    mov sbp, scp
+    push r0
+
+    cmp r2, 0
+    jz .end
+
+    mov r3, 0 ; counter
+.l:
+    mov DWORD [r3 * 4 + r0], r1
+    inc r3
+    cmp r3, r2
+    jl .l
+
+.end:
+    pop r0
+    pop sbp
+    ret
+
 /* memcpy
  * This function copies a memory region to another memory region.
  * Inputs: r0 = destination, r1 = source, r2 = number of bytes to copy

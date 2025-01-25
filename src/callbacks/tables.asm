@@ -33,10 +33,10 @@ VideoModeTable: ; 3 qwords, 24 bytes
     db 0 ; alignment
     dw 0 ; refresh rate
     dd 0 ; alignment
-    db 0 ; red size
-    db 0 ; green size
-    db 0 ; blue size
-    db 0 ; alpha size
+    db 0 ; red size in bits
+    db 0 ; green size in bits
+    db 0 ; blue size in bits
+    db 0 ; alpha size in bits
     db 0 ; red shift
     db 0 ; green shift
     db 0 ; blue shift

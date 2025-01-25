@@ -14,6 +14,18 @@ main:
     cmp r0, 0
     jnz .error
 
+    ; initialise the video device
+    call Video_Init
+    cmp r0, 0
+    jnz .no_video
+
+    ; set video mode to 0
+    mov r0, 0
+    call Video_SetMode
+    cmp r0, 0
+    jnz .video_device_error
+
+.no_video:
     ; initialise the storage device
     call Storage_Init
     cmp r0, 0
@@ -41,6 +53,10 @@ main:
     mov r0, storage_read_error_msg
     jmp .print_error
 
+.video_device_error:
+    mov r0, video_device_error_msg
+    jmp .print_error
+
 .print_error:
     call Console_Print
 
@@ -53,6 +69,9 @@ storage_init_error_msg:
 storage_read_error_msg:
     asciiz "Failed to read from storage device\n"
 
+video_device_error_msg:
+    asciiz "Failed to initialise video device\n"
+
 %include "callbacks/tables.asm"
 %include "memory.asm"
 %include "console.asm"
@@ -61,3 +80,4 @@ storage_read_error_msg:
 %include "stack.asm"
 %include "storage.asm"
 %include "utils.asm"
+%include "video.asm"

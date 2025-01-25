@@ -41,7 +41,8 @@ DevGetFunc:
     jmp .have_size
 
 .video:
-    ; fall through
+    mov r2, 40
+    jmp .have_size
 
 .storage:
     ; fall through
@@ -59,7 +60,48 @@ DevGetFunc:
  * Outputs: r0 = 0 on success, 1 on failure
  */
 ModeGetFunc:
+    push sbp
+    mov sbp, scp
+
+    push r15
+    push r14
+
+    mov r14, r0
+    mov r15, r1
+
+    ; validate that the memory is accessible
+    mov r0, r1
+    mov r1, 24
+    call Memory_ValidateAccess
+    cmp r0, 0
+    jnz .fail
+
+    ; next verify that the index is valid
+    cmp r14, DWORD [VideoDeviceTable+12]
+    jge .fail
+
+    ; then get the mode info
+    mov r0, r14
+    call Video_GetMode
+    cmp r0, 0
+    jnz .fail
+
+    ; copy the data to the buffer
+    mov r0, r15
+    mov r1, VideoModeTable
+    mov r2, 24
+    call memcpy
+
+    mov r0, 0
+    jmp .end
+
+.fail:
     mov r0, 1
+
+.end:
+    pop r14
+    pop r15
+    pop sbp
     ret
 
 /* ModeSetFunc
@@ -68,7 +110,26 @@ ModeGetFunc:
  * Outputs: r0 = 0 on success, 1 on failure
  */
 ModeSetFunc:
+    push sbp
+    mov sbp, scp
+    
+    ; verify that the index is valid
+    cmp r0, DWORD [VideoDeviceTable+12]
+    jge .fail
+
+    ; set the mode
+    call Video_SetMode
+    cmp r0, 0
+    jnz .fail
+
+    mov r0, 0
+    jmp .end
+
+.fail:
     mov r0, 1
+
+.end:
+    pop sbp
     ret
 
 /* GetFBFunc
@@ -77,7 +138,30 @@ ModeSetFunc:
  * Outputs: r0 = 0 on success, 1 on failure
  */
 GetFBFunc:
+    push sbp
+    mov sbp, scp
+
+    push r0
+
+    ; validate that the memory is accessible
+    mov r1, 8
+    call Memory_ValidateAccess
+    cmp r0, 0
+    jnz .fail
+
+    ; copy the framebuffer address to the buffer
+    pop r0
+    mov QWORD [r0], VIDEO_FRAMEBUFFER_ADDRESS
+
+    mov r0, 0
+    jmp .end
+
+.fail:
+    pop r0
     mov r0, 1
+
+.end:
+    pop sbp
     ret
 
 /* PrintFunc

@@ -25,6 +25,7 @@ Console_Init:
     jmp RegisterDevice ; can handle the rest
 
 .error:
+    pop r15
     mov r0, 1
     ret
 
