@@ -118,6 +118,18 @@ The table is expected to contain the following fields:
 |--------|------|-------------|-----------------------------------------------|
 | 0x00   | 8    | PrintFunc   | The address of the function to print a string |
 
+#### Device info table for a storage device
+
+The table is expected to contain the following fields:
+
+| Offset | Size | Name      | Description                                   |
+|--------|------|-----------|-----------------------------------------------|
+| 0x00   | 8    | SCount    | The number of sectors on the storage device   |
+| 0x08   | 2    | SSize     | The size of each sector on the storage device |
+| 0x0A   | 6    | Align0    | Padding                                       |
+| 0x10   | 8    | ReadFunc  | The address of the function to read sectors   |
+| 0x18   | 8    | WriteFunc | The address of the function to write sectors  |
+
 #### Memory info table
 
 The memory info table is expected to contain the following fields:
@@ -161,6 +173,50 @@ The functions returns the following:
 - `r0` - Device ID, -1 if the device doesn't exist
 
 If the pointer is 0 the function won't copy the table to the buffer, but will still return the device ID.
+
+#### Console device
+
+##### PrintFunc
+
+The function has 1 argument:
+
+- `r0` - A pointer to a null-terminated string to print
+
+The signature of the function in C would be:
+
+```c
+void PrintFunc(const char* str);
+```
+
+#### Storage device
+
+##### ReadFunc
+
+The function has 3 arguments:
+
+- `r0` - The starting LBA (sector number)
+- `r1` - The number of sectors to read
+- `r2` - A pointer to a buffer to store the data
+
+The signature of the function in C would be:
+
+```c
+void ReadFunc(uint64_t lba, uint64_t count, void* buffer);
+```
+
+##### WriteFunc
+
+The function has 3 arguments:
+
+- `r0` - The starting LBA (sector number)
+- `r1` - The number of sectors to write
+- `r2` - A pointer to a buffer with the data
+
+The signature of the function in C would be:
+
+```c
+void WriteFunc(uint64_t lba, uint64_t count, const void* buffer);
+```
 
 ### Memory map
 

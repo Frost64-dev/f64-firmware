@@ -14,17 +14,55 @@ main: ; r0 = pointer to root table
     cmp r0, -1
     jz .end
 
-
     mov r1, buffer
     call r13 ; actually get the callback to give us the device info
     cmp r0, -1
     jz .end
 
+    mov r11, QWORD [buffer] ; print function
+
     mov r0, message
-    call QWORD [buffer] ; call the print function the firmware provides
-    
+    call r11 ; call the print function the firmware provides
+
+    ; enumerate through the device looking for the storage device
+    mov r0, 2 ; device ID
+    mov r1, r12 ; number of devices
+    mov r2, r13 ; device get info callback
+    call FindDevice
+    cmp r0, -1
+    jz .storage_not_found
+
+    mov r1, buffer
+    call r13 ; actually get the callback to give us the device info
+    cmp r0, -1
+    jz .storage_error_message
+
+    mov r0, 16 ; LBA
+    mov r1, 1 ; count
+    mov r2, 0x80000 ; location to store data
+    call QWORD [buffer + 16] ; call read function
+    cmp r0, 0
+    jnz .storage_error_message
+
+.loaded:
+    mov r0, r11
+    jmp 0x80000 ; jump to test code
+
+.storage_not_found:
+    mov r0, storage_not_found_message
+    call r11 ; call the print function the firmware provides
+.storage_error_message:
+    mov r0, storage_error_message
+    call r11 ; call the print function the firmware provides
+
 .end:
     hlt
+
+storage_not_found_message:
+    asciiz "Storage device not found!\n"
+
+storage_error_message:
+    asciiz "Storage device error!\n"
 
 /* FindDevice
  * Function to find a device on the IOBus
@@ -69,6 +107,9 @@ FindDevice:
     ret
 
 buffer:
+    dq 0
+    dq 0
+    dq 0
     dq 0
 
 message:

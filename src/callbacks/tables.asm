@@ -45,6 +45,14 @@ VideoModeTable: ; 3 qwords, 24 bytes
 ConsoleDeviceTable: ; 1 qword, 8 bytes
     dq PrintFunc ; Print function
 
+StorageDeviceTable: ; 4 qwords, 32 bytes
+    dq 0 ; sector count
+    dw 0 ; sector size
+    dw 0 ; alignment
+    dd 0 ; alignment
+    dq ReadFunc ; Read function
+    dq WriteFunc ; Write function
+
 MemoryTable: ; 4 qwords, 32 bytes
     ascii "MEMRYTBL" ; magic number, 8 bytes
     dq 0 ; standard version

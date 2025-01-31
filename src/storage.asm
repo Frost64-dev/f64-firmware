@@ -32,6 +32,16 @@ Storage_Init:
     cmp r0, 0
     jnz .error
 
+    ; fill the info
+    mov QWORD [STORAGE_DEVICE_DATA], Storage_Info
+    mov r0, 1
+    call Storage_Command
+    cmp r0, 0
+    jnz .error
+
+    mov QWORD [StorageDeviceTable], QWORD [Storage_Info+8]
+    mov WORD [StorageDeviceTable+8], 512 ; sector size
+
     ; register the storage device
     mov r0, 2 ; device ID
     mov r1, r15 ; device index
@@ -39,6 +49,7 @@ Storage_Init:
     jmp RegisterDevice ; can handle the rest
 
 .error:
+    pop r15
     mov r0, 1
     ret
 
@@ -101,3 +112,7 @@ Storage_Transfer:
     dq Storage_PRL ; PRLS
     dq 1 ; PRLSNC
     dq 0 ; flags
+
+Storage_Info:
+    dq 0 ; raw size of device
+    dq 0 ; sector count (sector size is always 512 bytes)

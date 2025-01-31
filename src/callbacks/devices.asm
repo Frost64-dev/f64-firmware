@@ -79,7 +79,7 @@ GetDeviceTable:
     ret
 
 .storage:
-    mov r0, 0 ; unsupported
+    mov r0, StorageDeviceTable
     ret
 
 .not_found:

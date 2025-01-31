@@ -20,6 +20,8 @@ DevGetFunc:
 
     ; use r2 for size
 
+    mov r0, QWORD [r0 * 16 + Internal_DeviceTable] ; convert index to ID
+
     cmp r0, 1
     jl .console
     jz .video
@@ -45,7 +47,8 @@ DevGetFunc:
     jmp .have_size
 
 .storage:
-    ; fall through
+    mov r2, 32
+    jmp .have_size
     
 .fail:
     mov r0, -1
@@ -182,4 +185,108 @@ PrintFunc:
  */
 MemGetFunc:
     mov r0, 1
+    ret
+
+/* ReadFunc
+ * Function to read from storage device
+ * Inputs: r0 = starting LBA, r1 = number of sectors, r2 = address to store data
+ * Outputs: r0 = 0 on success, 1 on failure
+ */
+ReadFunc:
+    push sbp
+    mov sbp, scp
+
+    push r15
+    push r14
+    push r13
+
+    mov r13, r0
+    mov r14, r1
+    mov r15, r2
+
+    ; first check that the memory is accessible
+    mov r0, r2
+    mov r1, r1
+    shl r1, 9
+    call Memory_ValidateAccess
+    cmp r0, 0
+    jnz .fail
+
+    ; next ensure the LBA + number of sectors is valid
+    mov r0, r13
+    add r0, r14
+    cmp r0, QWORD [Storage_Info+8]
+    jg .fail
+
+    mov r0, r13
+    mov r1, r14
+    mov r2, r15
+
+    pop r13
+    pop r14
+    pop r15
+
+    mov scp, sbp
+    pop sbp
+
+    jmp Storage_Read
+
+.fail:
+    mov r0, 1
+
+.end:
+    mov scp, sbp
+    pop sbp
+    ret
+
+/* WriteFunc
+ * Function to write to storage device
+ * Inputs: r0 = starting LBA, r1 = number of sectors, r2 = address of data
+ * Outputs: r0 = 0 on success, 1 on failure
+ */
+WriteFunc:
+    push sbp
+    mov sbp, scp
+
+    push r15
+    push r14
+    push r13
+
+    mov r13, r0
+    mov r14, r1
+    mov r15, r2
+
+    ; first check that the memory is accessible
+    mov r0, r2
+    mov r1, r1
+    shl r1, 9
+    call Memory_ValidateAccess
+    cmp r0, 0
+    jnz .fail
+
+    ; next ensure the LBA + number of sectors is valid
+    mov r0, r13
+    add r0, r14
+    cmp r0, QWORD [Storage_Info+8]
+    jg .fail
+
+    mov r0, r13
+    mov r1, r14
+    mov r2, r15
+
+    pop r13
+    pop r14
+    pop r15
+
+    mov scp, sbp
+    pop sbp
+
+    jmp Storage_Write
+
+.fail:
+    mov r0, 1
+
+.end:
+    mov scp, sbp
+    pop sbp
     ret
