@@ -1,8 +1,7 @@
 # Copyright (©) 2024-2025  Frosty515
 
 ASM = frost64-asm
-# EMU = frost64-emu
-EMU = ../Frost64/build/Emulator/Emulator
+EMU = frost64-emu
 
 export ASM EMU
 
