@@ -14,7 +14,7 @@ all: clean
 	@$(ASM) -psrc/main.asm -obin/firmware.bin
 
 clean:
-	@rm -fr bin
+	@rm -fr bin image
 
 bootloader:
 	@$(ASM) -ptest/bootloader.asm -obin/bootloader.bin
